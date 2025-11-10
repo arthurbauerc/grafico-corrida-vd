@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Sertão Running 2023 - 8km Masculino</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Chart.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .chart-container {
+            position: relative;
+            margin: 0 auto;
+            max-width: 1000px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sertão Running 2023 - 8km Masculino</h1>
+    <p>Gráfico de linha com o tempo (em minutos) de cada atleta.</p>
+
+    <div class="chart-container">
+        <canvas id="timeChart"></canvas>
+    </div>
+
+    <script>
+        // Dados vindos da view Django
+        const labels = {{ labels_json|safe }};
+        const data = {{ data_json|safe }};
+
+        const ctx = document.getElementById('timeChart').getContext('2d');
+
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,  // nomes dos atletas no eixo X
+                datasets: [{
+                    label: 'Tempo (minutos) - 8km Masculino',
+                    data: data,
+                    tension: 0.3,     // curva suavizada
+                    fill: false,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.parsed.y;
+                                return 'Tempo: ' + value.toFixed(2) + ' min';
+                            }
+                        }
+                    },
+                    legend: {
+                        display: true
+                    }
+                },
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Tempo (minutos)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Atletas (ordenados pelo tempo)'
+                        },
+                        ticks: {
+                            autoSkip: true,   // pula alguns rótulos para não poluir
+                            maxRotation: 90,
+                            minRotation: 45
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Sertão Running 2023 - 8km Masculino</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #fafafa;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        p {
+            text-align: center;
+            color: #666;
+        }
+        .chart-container {
+            width: 95%;
+            max-width: 1200px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sertão Running 2023 - 8km Masculino</h1>
+    <p>Gráfico interativo com o tempo médio por atleta (minutos)</p>
+
+    <div class="chart-container">
+        <canvas id="timeChart"></canvas>
+    </div>
+
+    <script>
+        const labels = {{ labels_json|safe }};
+        const data = {{ data_json|safe }};
+
+        const ctx = document.getElementById('timeChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels.map((_, i) => i + 1),
+                datasets: [{
+                    label: 'Tempo (minutos)',
+                    data: data,
+                    borderColor: 'rgba(75,192,192,1)',
+                    backgroundColor: 'rgba(75,192,192,0.1)',
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointHoverRadius: 6,
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                aspectRatio: window.innerWidth < 768 ? 1 : 2,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                const index = context[0].dataIndex;
+                                return labels[index];
+                            },
+                            label: function(context) {
+                                return 'Tempo: ' + context.parsed.y.toFixed(2) + ' min';
+                            }
+                        }
+                    },
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Tempo (minutos)',
+                            color: '#333'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Posição (1º, 2º, 3º...)',
+                            color: '#333'
+                        },
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: true
+                        }
+                    }
+                }
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            chart.resize();
+        });
+    </script>
+</body>
+</html>
